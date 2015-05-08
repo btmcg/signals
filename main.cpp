@@ -1,3 +1,4 @@
+#include <cassert>
 #include <cerrno>
 #include <csignal>
 #include <cstring>
@@ -13,11 +14,11 @@ int main( int argc, char* argv[] )
     ::sigemptyset( &sigset );
 
     // Add the signals we want to handle.
-    ::sigaddset( &sigset, SIGINT );
-    ::sigaddset( &sigset, SIGTERM );
-    ::sigaddset( &sigset, SIGHUP );
-    ::sigaddset( &sigset, SIGUSR1 );
-    ::sigaddset( &sigset, SIGUSR2 );
+    assert( ::sigaddset( &sigset, SIGINT ) != -1 );
+    assert( ::sigaddset( &sigset, SIGTERM ) != -1 );
+    assert( ::sigaddset( &sigset, SIGHUP ) != -1 );
+    assert( ::sigaddset( &sigset, SIGUSR1) != -1 );
+    assert( ::sigaddset( &sigset, SIGUSR2) != -1 );
 
     // Block the signals so that we can handle them in sigtimedwait.
     if ( ::sigprocmask( SIG_BLOCK, &sigset, nullptr ) == -1 )
@@ -47,11 +48,13 @@ int main( int argc, char* argv[] )
 
         switch ( siginfo.si_signo )
         {
+            // Exit on these signals.
             case SIGINT:
             case SIGTERM:
                 std::cout << "Caught signal: " << ::strsignal( siginfo.si_signo ) << std::endl;
                 return 0;
 
+            // Just report these signals.
             case SIGHUP:
             case SIGUSR1:
             case SIGUSR2:
