@@ -29,3 +29,6 @@
 
 # Dependency files created by gcc
 *.d
+
+# Executable
+sigtimedwait
