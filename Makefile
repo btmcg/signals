@@ -27,8 +27,8 @@ RM       := rm -rf
 #
 # General compiler/linker flags.
 #
-CXXFLAGS += -rdynamic -g -pedantic -Wall -Werror -Winline -Woverloaded-virtual -Wnon-virtual-dtor -O3 -std=c++14 -MMD -fPIC -flto -fdiagnostics-color=auto
-CFLAGS   += -rdynamic -g -pedantic -Wall -Werror -Winline -O3 -MMD -fPIC -flto -fdiagnostics-color=auto
+CXXFLAGS += -g -pedantic -Wall -Werror -Winline -Woverloaded-virtual -Wnon-virtual-dtor -O3 -std=c++14 -MMD -fPIC -flto -fdiagnostics-color=auto
+CFLAGS   += -g -pedantic -Wall -Werror -Winline -O3 -MMD -fPIC -flto -fdiagnostics-color=auto
 LDFLAGS  += -rdynamic -fPIC -flto
 
 
