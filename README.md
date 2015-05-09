@@ -1,2 +1,2 @@
-# sigtimedwait
-Example of sigtimedwait usage.
+# signals
+Example usage of different signal apis
