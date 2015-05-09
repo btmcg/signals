@@ -11,7 +11,8 @@ include mk/env.mk
 
 
 # Define all projects first
-SUBDIRS = sigtimedwait
+SUBDIRS = signalfd \
+          sigtimedwait
 
 
 # Sets of directories to do various things in
