@@ -1,68 +1,57 @@
 #!/usr/bin/env make
 
-NAME    ?= $(shell basename $(shell pwd))
-TARGET  ?= $(NAME)
-C_SRC   ?= $(wildcard *.c)
-CXX_SRC ?= $(wildcard *.cpp)
-OBJ     ?= $(C_SRC:.c=.o) $(CXX_SRC:.cpp=.o)
+BUILD_ROOT ?= $(CURDIR)
+
+# Error if BUILD_ROOT not defined.
+ifeq ($(BUILD_ROOT),)
+    $(error "BUILD_ROOT not defined")
+endif
+
+include mk/env.mk
 
 
-ARCH := $(shell arch)
-
-#
-# Commands
-#
-AR       := ar -cq
-CC       := gcc
-CP       := cp -f
-CXX      := g++
-DOXYGEN  := doxygen
-MAKE     := make
-MKDIR    := mkdir -p
-MV       := mv -f
-PYCLEAN  := pyclean
-PYTHON   := python
-RM       := rm -rf
-
-#
-# General compiler/linker flags.
-#
-CXXFLAGS += -g -pedantic -Wall -Werror -Winline -Woverloaded-virtual -Wnon-virtual-dtor -O3 -std=c++14 -MMD -fPIC -flto -fdiagnostics-color=auto
-CFLAGS   += -g -pedantic -Wall -Werror -Winline -O3 -MMD -fPIC -flto -fdiagnostics-color=auto
-LDFLAGS  += -rdynamic -fPIC -flto
+# Define all projects first
+SUBDIRS = sigtimedwait
 
 
-#
-# Targets
-#
-
-all:: $(TARGET)
-
-clean::
-	$(RM) $(OBJ) $(TARGET) *.d
-
-doc::
-	$(DOXYGEN) $(DOXYFILE)
-
-$(TARGET):: $(OBJ)
-	$(CXX) $(OBJ) $(LDFLAGS) -o $(TARGET)
-
--include *.d
+# Sets of directories to do various things in
+BUILD_DIRS     := $(SUBDIRS:%=build-%)
+CLEAN_DIRS     := $(SUBDIRS:%=clean-%)
+DISTCLEAN_DIRS := $(SUBDIRS:%=distclean-%)
+INSTALL_DIRS   := $(SUBDIRS:%=install-%)
+TEST_DIRS      := $(SUBDIRS:%=test-%)
 
 
-#
-# Suffix rules
-#
+all: $(BUILD_DIRS)
+$(SUBDIRS): $(BUILD_DIRS)
+$(BUILD_DIRS):
+	$(MAKE) -C src/$(@:build-%=%)
 
-.SUFFIXES:
-.SUFFIXES: .cpp .c .o
+clean: $(CLEAN_DIRS)
+$(CLEAN_DIRS):
+	$(MAKE) -C src/$(@:clean-%=%) $(MAKECMDGOALS)
 
-.cpp.o:
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+distclean: $(DISTCLEAN_DIRS)
+$(DISTCLEAN_DIRS):
+	$(MAKE) -C src/$(@:distclean-%=%) $(MAKECMDGOALS)
+	$(RM) doc
 
-.c.o:
-	$(CC) $(CFLAGS) -c $< -o $@
+doc:
+	doxygen $(DOXYFILE)
+
+install: $(INSTALL_DIRS) all
+$(INSTALL_DIRS):
+	$(MAKE) -C src/$(@:install-%=%) $(MAKECMDGOALS)
+
+test: $(TEST_DIRS) all
+$(TEST_DIRS):
+	$(MAKE) -C src/$(@:test-%=%) $(MAKECMDGOALS)
 
 
-.PHONY: $(TARGET)
-.PHONY: all clean doc test
+.PHONY: $(BUILD_DIRS)
+.PHONY: $(CLEAN_DIRS)
+.PHONY: $(DISTCLEAN_DIRS)
+.PHONY: $(INSTALL_DIRS)
+.PHONY: $(SUBDIRS)
+.PHONY: $(TEST_DIRS)
+.PHONY: all clean distclean doc install test
