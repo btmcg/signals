@@ -11,7 +11,7 @@ int main( int argc, char* argv[] )
     sigset_t sigset;
 
     // Empty the signal set.
-    ::sigemptyset( &sigset );
+    assert( ::sigemptyset( &sigset ) != -1 );
 
     // Add the signals we want to handle.
     assert( ::sigaddset( &sigset, SIGINT ) != -1 );
