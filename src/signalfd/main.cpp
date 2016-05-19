@@ -1,6 +1,7 @@
 #include <cassert>
 #include <cerrno>
 #include <csignal>
+#include <cstddef> // std::size_t
 #include <cstring>
 #include <ctime>
 #include <iostream>
@@ -9,7 +10,7 @@
 #include <unistd.h>
 
 
-int main(int argc, char* argv[])
+int main()
 {
     sigset_t sigset;
     ::sigemptyset( &sigset );
@@ -65,13 +66,13 @@ int main(int argc, char* argv[])
             // we received a signal
             if (events[i].data.fd == signal_fd) {
                 signalfd_siginfo info;
-                const int bytes = ::read(signal_fd, &info, sizeof(info));
+                const ssize_t bytes = ::read(signal_fd, &info, sizeof(info));
                 if (bytes == -1) {
                     std::cerr << "read: " << std::strerror(errno) << std::endl;
                     return 1;
                 }
 
-                if (bytes != sizeof(info)) {
+                if (static_cast<std::size_t>(bytes) != sizeof(info)) {
                     std::cerr << "read wrong number of bytes" << std::endl;
                     return 1;
                 }
@@ -80,14 +81,16 @@ int main(int argc, char* argv[])
                     // exit on these signals.
                     case SIGINT:
                     case SIGTERM:
-                        std::cout << "Caught signal: " << ::strsignal(info.ssi_signo) << std::endl;
+                        std::cout << "Caught signal: "
+                                << ::strsignal(static_cast<int>(info.ssi_signo)) << std::endl;
                         return 0;
 
                     // just report these signals
                     case SIGHUP:
                     case SIGUSR1:
                     case SIGUSR2:
-                        std::cout << "Caught signal: " << ::strsignal(info.ssi_signo) << std::endl;
+                        std::cout << "Caught signal: "
+                                << ::strsignal(static_cast<int>(info.ssi_signo)) << std::endl;
                         break;
 
                     default:

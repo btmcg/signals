@@ -6,7 +6,7 @@
 #include <iostream>
 
 
-int main(int argc, char* argv[])
+int main()
 {
     sigset_t sigset;
 

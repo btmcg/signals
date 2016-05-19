@@ -1,44 +1,78 @@
-#
-# Architecture
-#
+# GNU Make built-in targets
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-ARCH := $(shell arch)
+# delete the target if a recipe fails with a non-zero status
+.DELETE_ON_ERROR:
 
-#
-# Commands
-#
-
-AR       := ar -cq
-CC       := gcc
-CP       := cp -f
-CXX      := g++
-DOXYGEN  := doxygen
-MAKE     := make
-MKDIR    := mkdir -p
-MV       := mv -f
-PYCLEAN  := pyclean
-PYTHON   := python
-RM       := rm -rf
-
-#
-# General compiler/linker flags.
-#
-
-CXXFLAGS += -g -pedantic -Wall -Werror -Winline -Woverloaded-virtual -Wnon-virtual-dtor -O3 -std=c++14 -MMD -fPIC -flto -fdiagnostics-color=auto
-CFLAGS   += -g -pedantic -Wall -Werror -Winline -O3 -MMD -fPIC -flto -fdiagnostics-color=auto
-LDFLAGS  += -rdynamic -fPIC -flto
+# standardize on good ol' Bourne shell
+SHELL := /bin/sh
 
 
-#
-# Suffix rules
-#
+# output directories
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-.SUFFIXES:
-.SUFFIXES: .cpp .c .o
+BIN_DIR := bin
+LIB_DIR := lib
 
-.cpp.o:
-	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-.c.o:
-	$(CC) $(CFLAGS) -c $< -o $@
+# command variables
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+CC      := gcc
+CP      := cp -f
+CXX     := g++
+DOXYGEN := doxygen
+MKDIR   := mkdir -p
+MV      := mv -f
+RM      := rm -f
+RMDIR   := rmdir
+
+
+# compiler and linker flags
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# gcc warning flags
+CPPWFLAGS += \
+  -Wall \
+  -Wcast-align \
+  -Wcast-qual \
+  -Wconversion \
+  -Wdisabled-optimization \
+  -Wempty-body \
+  -Werror \
+  -Wextra \
+  -Wfloat-equal \
+  -Wformat=2 \
+  -Wmissing-include-dirs \
+  -Wshadow \
+  -Wsign-conversion \
+  -Wswitch-default \
+  -Wswitch-enum \
+  -Wundef \
+  -Wuninitialized
+CWFLAGS   +=
+CXXWFLAGS += \
+  -Wctor-dtor-privacy \
+  -Wnon-virtual-dtor \
+  -Woverloaded-virtual \
+  -Wsuggest-final-methods \
+  -Wsuggest-final-types \
+  -Wsuggest-override \
+  -Wuseless-cast \
+  -Wzero-as-null-pointer-constant
+
+# gcc optimization flags
+ifdef DEBUG
+  OPTFLAGS := -O0 -fno-inline -fno-elide-constructors
+else
+  OPTFLAGS := -O3 -flto -DNDEBUG
+endif
+
+# compiler flags
+CPPFLAGS += -ggdb3 -fstrict-aliasing -pedantic-errors $(CPPWFLAGS) -MMD -fPIC $(OPTFLAGS) -iquotesrc
+CXXFLAGS += -fno-operator-names $(CXXWFLAGS) -std=c++14
+CFLAGS   += $(CWFLAGS) -std=c11
+
+# linker flags
+LDFLAGS += -rdynamic -Wl,-rpath=$(LIB_DIR),--enable-new-dtags
+LDLIBS  += -lrt -lpthread

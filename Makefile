@@ -1,58 +1,43 @@
-#!/usr/bin/env make
-
-BUILD_ROOT ?= $(CURDIR)
-
-# Error if BUILD_ROOT not defined.
-ifeq ($(BUILD_ROOT),)
-    $(error "BUILD_ROOT not defined")
-endif
-
 include mk/env.mk
+include mk/functions.mk
+
+# initialization
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# load modules (any subdirectory that contains a "module.mk" file)
+$(call load-modules)
 
 
-# Define all projects first
-SUBDIRS = signalfd \
-          sigtimedwait
+# rules and dependencies
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# generate all necessary rules
+$(eval $(call build-rules,$(call get-all-modules)))
 
 
-# Sets of directories to do various things in
-BUILD_DIRS     := $(SUBDIRS:%=build-%)
-CLEAN_DIRS     := $(SUBDIRS:%=clean-%)
-DISTCLEAN_DIRS := $(SUBDIRS:%=distclean-%)
-INSTALL_DIRS   := $(SUBDIRS:%=install-%)
-TEST_DIRS      := $(SUBDIRS:%=test-%)
+# recipes
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+# necessary targets and phony targets
+.PHONY: all clean distclean list-modules $(call get-all-modules)
 
-all: $(BUILD_DIRS)
-$(SUBDIRS): $(BUILD_DIRS)
-$(BUILD_DIRS):
-	$(MAKE) -C src/$(@:build-%=%)
+all: $(call get-all-modules)
 
-clean: $(CLEAN_DIRS)
-$(CLEAN_DIRS):
-	$(MAKE) -C src/$(@:clean-%=%) $(MAKECMDGOALS)
+clean:
+	$(if $(wildcard $(call get-all-targets) $(call get-all-objs) $(call get-all-deps)),\
+		$(RM) $(strip $(call get-all-targets)) $(call get-all-objs) $(call get-all-deps))
 
-distclean: $(DISTCLEAN_DIRS)
-$(DISTCLEAN_DIRS):
-	$(MAKE) -C src/$(@:distclean-%=%) $(MAKECMDGOALS)
-	$(RM) doc
+distclean: clean
+	$(if $(wildcard $(LIB_DIR)),\
+		$(RM) $(LIB_DIR)/* && $(RMDIR) $(LIB_DIR))
+	$(if $(wildcard $(BIN_DIR)),\
+		$(RM) $(BIN_DIR)/* && $(RMDIR) $(BIN_DIR))
 
-doc:
-	doxygen $(DOXYFILE)
+list-modules:
+	$(list-modules)
 
-install: $(INSTALL_DIRS) all
-$(INSTALL_DIRS):
-	$(MAKE) -C src/$(@:install-%=%) $(MAKECMDGOALS)
+$(BIN_DIR):
+	$(MKDIR) $(BIN_DIR)
 
-test: $(TEST_DIRS) all
-$(TEST_DIRS):
-	$(MAKE) -C src/$(@:test-%=%) $(MAKECMDGOALS)
-
-
-.PHONY: $(BUILD_DIRS)
-.PHONY: $(CLEAN_DIRS)
-.PHONY: $(DISTCLEAN_DIRS)
-.PHONY: $(INSTALL_DIRS)
-.PHONY: $(SUBDIRS)
-.PHONY: $(TEST_DIRS)
-.PHONY: all clean distclean doc install test
+$(LIB_DIR):
+	$(MKDIR) $(LIB_DIR)
