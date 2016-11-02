@@ -1,3 +1,6 @@
+#include <sys/epoll.h>
+#include <sys/signalfd.h>
+#include <unistd.h>
 #include <cassert>
 #include <cerrno>
 #include <csignal>
@@ -5,15 +8,12 @@
 #include <cstring>
 #include <ctime>
 #include <iostream>
-#include <sys/epoll.h>
-#include <sys/signalfd.h>
-#include <unistd.h>
 
 
 int main()
 {
     sigset_t sigset;
-    ::sigemptyset( &sigset );
+    ::sigemptyset(&sigset);
 
     assert(::sigaddset(&sigset, SIGINT) != -1);
     assert(::sigaddset(&sigset, SIGTERM) != -1);
@@ -45,7 +45,7 @@ int main()
     epoll_event ev;
     ev.events = EPOLLIN;
     ev.data.fd = signal_fd;
-    if (::epoll_ctl( epoll_fd, EPOLL_CTL_ADD, signal_fd, &ev ) == -1) {
+    if (::epoll_ctl(epoll_fd, EPOLL_CTL_ADD, signal_fd, &ev) == -1) {
         std::cerr << "epoll_ctl: " << std::strerror(errno) << std::endl;
         return 1;
     }
@@ -78,24 +78,24 @@ int main()
                 }
 
                 switch (info.ssi_signo) {
-                    // exit on these signals.
-                    case SIGINT:
-                    case SIGTERM:
-                        std::cout << "Caught signal: "
-                                << ::strsignal(static_cast<int>(info.ssi_signo)) << std::endl;
-                        return 0;
+                // exit on these signals.
+                case SIGINT:
+                case SIGTERM:
+                    std::cout << "Caught signal: " << ::strsignal(static_cast<int>(info.ssi_signo))
+                              << std::endl;
+                    return 0;
 
-                    // just report these signals
-                    case SIGHUP:
-                    case SIGUSR1:
-                    case SIGUSR2:
-                        std::cout << "Caught signal: "
-                                << ::strsignal(static_cast<int>(info.ssi_signo)) << std::endl;
-                        break;
+                // just report these signals
+                case SIGHUP:
+                case SIGUSR1:
+                case SIGUSR2:
+                    std::cout << "Caught signal: " << ::strsignal(static_cast<int>(info.ssi_signo))
+                              << std::endl;
+                    break;
 
-                    default:
-                        std::cout << "wtf?" << std::endl;
-                        return 1;
+                default:
+                    std::cout << "wtf?" << std::endl;
+                    return 1;
                 }
             } // received sig
         } // for each event

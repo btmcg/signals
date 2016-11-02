@@ -10,7 +10,7 @@ int main()
 {
     sigset_t sigset;
 
-    assert(::sigemptyset( &sigset ) != -1);
+    assert(::sigemptyset(&sigset) != -1);
 
     assert(::sigaddset(&sigset, SIGINT) != -1);
     assert(::sigaddset(&sigset, SIGTERM) != -1);
@@ -41,22 +41,22 @@ int main()
         }
 
         switch (siginfo.si_signo) {
-            // exit on these signals
-            case SIGINT:
-            case SIGTERM:
-                std::cout << "Caught signal: " << ::strsignal(siginfo.si_signo) << std::endl;
-                return 0;
+        // exit on these signals
+        case SIGINT:
+        case SIGTERM:
+            std::cout << "Caught signal: " << ::strsignal(siginfo.si_signo) << std::endl;
+            return 0;
 
-            // just report these signals
-            case SIGHUP:
-            case SIGUSR1:
-            case SIGUSR2:
-                std::cout << "Caught signal: " << ::strsignal(siginfo.si_signo) << std::endl;
-                break;
+        // just report these signals
+        case SIGHUP:
+        case SIGUSR1:
+        case SIGUSR2:
+            std::cout << "Caught signal: " << ::strsignal(siginfo.si_signo) << std::endl;
+            break;
 
-            default:
-                std::cout << "wtf?" << std::endl;
-                return 1;
+        default:
+            std::cout << "wtf?" << std::endl;
+            return 1;
         }
 
     } // while (true)
