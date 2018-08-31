@@ -1,17 +1,12 @@
-# Compiled object files
-*.o
-
-# Compiled dynamic libraries
-*.so
-
-# Compiled static libraries
-*.a
-
-# Dependency files created by gcc
-*.d
-
-# Executables
 bin/
 lib/
+
+*.a
+*.d
+*.o
+*.so
+
 src/signalfd/signalfd
 src/sigtimedwait/sigtimedwait
+
+src/version.h
