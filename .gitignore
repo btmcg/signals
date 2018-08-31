@@ -1,35 +1,17 @@
-# Compiled Object files
-*.slo
-*.lo
+# Compiled object files
 *.o
-*.obj
 
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
+# Compiled dynamic libraries
 *.so
-*.dylib
-*.dll
 
-# Fortran module files
-*.mod
-
-# Compiled Static libraries
-*.lai
-*.la
+# Compiled static libraries
 *.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
 
 # Dependency files created by gcc
 *.d
 
 # Executables
-signalfd
-sigtimedwait
+bin/
+lib/
+src/signalfd/signalfd
+src/sigtimedwait/sigtimedwait
