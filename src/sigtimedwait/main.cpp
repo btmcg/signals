@@ -6,7 +6,7 @@
 #include <iostream>
 
 
-int main()
+int main(int, char**)
 {
     sigset_t sigset;
 
@@ -25,7 +25,7 @@ int main()
     }
 
     // set our timeout value to one second
-    const timespec timeout = {1, 0};
+    timespec const timeout = {1, 0};
 
     siginfo_t siginfo;
 

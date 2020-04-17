@@ -10,7 +10,7 @@
 #include <iostream>
 
 
-int main()
+int main(int, char**)
 {
     sigset_t sigset;
     ::sigemptyset(&sigset);
@@ -28,14 +28,14 @@ int main()
     }
 
     // get the signalfd file descriptor
-    const int signal_fd = ::signalfd(-1, &sigset, SFD_NONBLOCK);
+    int const signal_fd = ::signalfd(-1, &sigset, SFD_NONBLOCK);
     if (signal_fd == -1) {
         std::cerr << "signalfd: " << std::strerror(errno) << std::endl;
         return 1;
     }
 
     // get epoll file descriptor
-    const int epoll_fd = ::epoll_create1(0);
+    int const epoll_fd = ::epoll_create1(0);
     if (epoll_fd == -1) {
         std::cerr << "epoll_create1: " << std::strerror(errno) << std::endl;
         return 1;
@@ -56,7 +56,7 @@ int main()
     // Main loop
     while (true) {
         // block in epoll for 1 second at a time
-        const int num_events = ::epoll_wait(epoll_fd, events, 1, 1000);
+        int const num_events = ::epoll_wait(epoll_fd, events, 1, 1000);
         if (num_events == -1) {
             std::cerr << "epoll_wait: " << std::strerror(errno) << std::endl;
             return 1;
@@ -66,7 +66,7 @@ int main()
             // we received a signal
             if (events[i].data.fd == signal_fd) {
                 signalfd_siginfo info;
-                const ssize_t bytes = ::read(signal_fd, &info, sizeof(info));
+                ::ssize_t const bytes = ::read(signal_fd, &info, sizeof(info));
                 if (bytes == -1) {
                     std::cerr << "read: " << std::strerror(errno) << std::endl;
                     return 1;
