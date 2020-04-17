@@ -9,4 +9,4 @@ lib/
 src/signalfd/signalfd
 src/sigtimedwait/sigtimedwait
 
-src/version.h
+src/version.hpp
