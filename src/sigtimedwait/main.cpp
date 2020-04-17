@@ -6,7 +6,8 @@
 #include <iostream>
 
 
-int main(int, char**)
+int
+main(int, char**)
 {
     sigset_t sigset;
 
@@ -34,29 +35,30 @@ int main(int, char**)
         // wait for our signal
         if (::sigtimedwait(&sigset, &siginfo, &timeout) == -1) {
             // no signal occurred
-            if (errno == EAGAIN) continue;
+            if (errno == EAGAIN)
+                continue;
 
             std::cerr << "sigprocmask: " << std::strerror(errno) << std::endl;
             return 1;
         }
 
         switch (siginfo.si_signo) {
-        // exit on these signals
-        case SIGINT:
-        case SIGTERM:
-            std::cout << "Caught signal: " << ::strsignal(siginfo.si_signo) << std::endl;
-            return 0;
+            // exit on these signals
+            case SIGINT:
+            case SIGTERM:
+                std::cout << "Caught signal: " << ::strsignal(siginfo.si_signo) << std::endl;
+                return 0;
 
-        // just report these signals
-        case SIGHUP:
-        case SIGUSR1:
-        case SIGUSR2:
-            std::cout << "Caught signal: " << ::strsignal(siginfo.si_signo) << std::endl;
-            break;
+            // just report these signals
+            case SIGHUP:
+            case SIGUSR1:
+            case SIGUSR2:
+                std::cout << "Caught signal: " << ::strsignal(siginfo.si_signo) << std::endl;
+                break;
 
-        default:
-            std::cout << "wtf?" << std::endl;
-            return 1;
+            default:
+                std::cout << "wtf?" << std::endl;
+                return 1;
         }
 
     } // while (true)

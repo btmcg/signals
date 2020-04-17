@@ -10,7 +10,8 @@
 #include <iostream>
 
 
-int main(int, char**)
+int
+main(int, char**)
 {
     sigset_t sigset;
     ::sigemptyset(&sigset);
@@ -78,24 +79,24 @@ int main(int, char**)
                 }
 
                 switch (info.ssi_signo) {
-                // exit on these signals.
-                case SIGINT:
-                case SIGTERM:
-                    std::cout << "Caught signal: " << ::strsignal(static_cast<int>(info.ssi_signo))
-                              << std::endl;
-                    return 0;
+                    // exit on these signals.
+                    case SIGINT:
+                    case SIGTERM:
+                        std::cout << "Caught signal: "
+                                  << ::strsignal(static_cast<int>(info.ssi_signo)) << std::endl;
+                        return 0;
 
-                // just report these signals
-                case SIGHUP:
-                case SIGUSR1:
-                case SIGUSR2:
-                    std::cout << "Caught signal: " << ::strsignal(static_cast<int>(info.ssi_signo))
-                              << std::endl;
-                    break;
+                    // just report these signals
+                    case SIGHUP:
+                    case SIGUSR1:
+                    case SIGUSR2:
+                        std::cout << "Caught signal: "
+                                  << ::strsignal(static_cast<int>(info.ssi_signo)) << std::endl;
+                        break;
 
-                default:
-                    std::cout << "wtf?" << std::endl;
-                    return 1;
+                    default:
+                        std::cout << "wtf?" << std::endl;
+                        return 1;
                 }
             } // received sig
         } // for each event
