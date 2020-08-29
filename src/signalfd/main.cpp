@@ -99,8 +99,8 @@ main(int, char**)
                         return 1;
                 }
             } // received sig
-        } // for each event
-    } // while (true)
+        }     // for each event
+    }         // while (true)
 
     return 0;
 
